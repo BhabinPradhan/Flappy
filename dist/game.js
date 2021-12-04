@@ -2732,13 +2732,13 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
 
   // code/main.js
   Es({
-    widht: 1024,
+    width: 1024,
     height: 768,
     stretch: true,
     letterbox: true
   });
   var WIDTH = 1024;
-  var HIGHT = 768;
+  var HEIGHT = 767;
   loadSprite("flappy", "sprites/flappy.png");
   loadSprite("bg", "sprites/bg.png");
   scene("main", () => {
@@ -2746,31 +2746,31 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     const PIPE_OPEN = 240;
     const PIPE_MIN = 60;
     const SPEED = 320;
-    const CELLING = -55;
+    const CEILING = -55;
     layers(["bg", "obj", "ui"], "obj");
     gravity(3200);
-    const flappy_ = add([
+    const flappy = add([
       sprite("flappy"),
       pos(WIDTH / 4, 0),
       area(),
       body()
     ]);
     add([
-      sprites("bg"),
+      sprite("bg"),
       pos(0, 0),
       layer("bg")
     ]);
     mouseClick(() => {
-      flappy.jump(800);
+      flappy.jump(JUMP_FORCE);
     });
     flappy.action(() => {
-      if (flappy.pos.y >= HIGHT || flappy.pos.y <= CELLIN) {
+      if (flappy.pos.y >= HEIGHT || flappy.pos.y <= CEILING) {
         go("lose");
       }
     });
-    function spawnPipw() {
+    function spawnPipe() {
       let h1 = rand(PIPE_MIN, HEIGHT - PIPE_MIN - PIPE_OPEN);
-      let h2 = HIGHT - h1 - PIPE_OPEN;
+      let h2 = HEIGHT - h1 - PIPE_OPEN;
       add([
         pos(WIDTH, 0),
         rect(64, h1),
@@ -2782,25 +2782,49 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         "pipe"
       ]);
       add([
-        pos(WIDTH, H1 + PIPE_OPEN),
-        rect(64, h1),
+        pos(WIDTH, h1 + PIPE_OPEN),
+        rect(64, h2),
         color(111, 187, 49),
-        area(),
         outline(4),
+        area(),
         move(LEFT, SPEED),
         cleanup(),
         "pipe"
       ]);
-      loop(1, () => {
-        spawnPipe();
-      });
-      flappy.collides("pipe", () => {
-        go("lose");
-      });
     }
-    __name(spawnPipw, "spawnPipw");
+    __name(spawnPipe, "spawnPipe");
+    loop(1, () => {
+      spawnPipe();
+    });
+    flappy.collides("pipe", () => {
+      go("lose");
+    });
   });
   scene("lose", () => {
+    add([
+      sprite("bg"),
+      pos(0, 0)
+    ]);
+    add([
+      sprite("flappy"),
+      pos(WIDTH / 2, HEIGHT / 2 - 100),
+      scale(3),
+      origin("center")
+    ]);
+    add([
+      text("GAMEOVER"),
+      pos(WIDTH / 2, HEIGHT / 2 + 100),
+      scale(2.5),
+      origin("center")
+    ]);
+    add([
+      text("CLICK TO PLAY AGAIN"),
+      pos(WIDTH / 2, HEIGHT / 2 + 300),
+      origin("center")
+    ]);
+    mouseClick(() => {
+      go("main");
+    });
   });
   go("main");
 })();
